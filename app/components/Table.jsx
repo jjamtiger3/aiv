@@ -1,14 +1,6 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import Button from "./Button";
-import CheckBox from "./CheckBox";
-import Tooltip from "./Tooltip";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import PagingToolbar from "./PagingToolbar";
-import Select from "./Select";
 import Input from "./Input";
-import { useDispatch } from "react-redux";
-import Radio from "./Radio";
 
 const TableWrapper = styled.table`
     width: 100%;
@@ -27,10 +19,7 @@ const TableWrapper = styled.table`
             padding: ${(props) => `${props.headerstyle?.style?.padding}` || '0'};
             font-weight: ${(props) => `${props.headerstyle?.style?.fontWeight || '700'}`};
             font-size: ${(props) => `${props.headerstyle?.style?.font?.size || '12px'}`};
-            line-height: 24px;
-            &.th-tooltip-text {
-              margin: 0 5px;
-            }
+            line-height: 25px;
             &:first-child {
                 border-left: none;
             }
@@ -113,20 +102,15 @@ const TableWrapper = styled.table`
     }
     ${(props) => props.customclass}
 `
-const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, ...props }, ref) => {
+const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props }) => {
     const { rowHeight, border, header, customClass, page, row, stripped, summary } = config;
     const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || '데이터가 없습니다.');
-    const [totalPages, setTotalPages] = useState(1);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [allChecked, setAllChecked] = useState(false);
 
-    const dispatch = useDispatch();
 
     const [tableData, setTableData] = useState(rows);
     useEffect(() => {
       if (!rows || rows.length === 0) {
         setTableData([]);
-        setTotalPages(1);
         return;
       }
       const updatedRows = rows.map((row, index) => ({
@@ -134,10 +118,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
         index
       }));
       setTableData(updatedRows);
-      setTotalPages(page?.totalPage || 1);
     }, [rows]);
-    const childRef = useRef();
-    const allCheckChildRef = useRef();
     // columns 의 children depth계산
     // columns의 각 요소는 children을 가질수있음
     // children의 각 child는 children을 가질 수 있음
@@ -167,153 +148,16 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
         props.onRowClick && props.onRowClick(row, rowIndex);
     }
     const handleCellClick = (column, row) => {
-      if (column.type === 'radio') {
-        // rows에서 row가 몇번째에있는지 확인
-        let rowIndex = 0;
-        rows.forEach((_row, index) => {
-          _row.index = index;
-          if (JSON.stringify(row) === JSON.stringify(_row)) {
-            rowIndex = index;
-            return;
-          }
-        })
-        const radioId = `${id}_${rowIndex}_${column.id}`;
-        const radioEl = document.getElementById(radioId);
-        radioEl.click();
-      }
-        props.onCellClick && props.onCellClick(column, row, row[column.id]);
-    }
-    // 페이지 번호 클릭 시 처리 함수
-    const handlePageNumberClick = (pageNum) => {
-      setCurrentPage(pageNum);
-      if (props.onPageChange) {
-        props.onPageChange(pageNum);
-      }
-    };
-
-    const makeNewRowObject = (columns) => {
-      const newRow = {};
-      columns.forEach((column) => {
-        if (!column.children) {
-          if (column.id) {
-            newRow[column.id] = column.type === 'select' ? column.options[column.defaultIndex || 0].value : '';
-          }
-        } else {
-          return makeNewRowObject(column.children);
-        }
-      });
-      return newRow;
-    }
-
-    const appendRow = (rowObj) => {
-      let newRow = rowObj || makeNewRowObject(columns);
-      if (Object.keys(newRow).length === 0) {
-        newRow = makeNewRowObject(columns);
-      }
-      newRow.index = tableData.length;
-      tableData.push(newRow);
-      setTableData([...tableData]);
-    }
-
-    const getTableData = () => {
-      return tableData;
-    }
-
-    const updateRow = (rowIndex, row) => {
-      Object.assign(tableData[rowIndex], row);
-      setTableData([...tableData]);
-      dispatch({ type: 'ON_UPDATE_ROW',  payload: { rowIndex, row } });
-    }
-
-    const updateCell = (rowIndex, columnId, value) => {
-      tableData[rowIndex][columnId] = value;
-      setTableData([...tableData]);
-    }
-
-    const disableRow = (row, disabled) => {
-      tableData[row.index].disabled = disabled;
-      setTableData([...tableData]);
-    }
-
-    const getCheckedRows = () => {
-      return tableData.filter(row => row.checked);
-    }
-
-    const setPage = (page) => {
-      setCurrentPage(page);
-    }
-
-    useImperativeHandle(ref, () => ({
-      appendRow,
-      updateRow,
-      updateCell,
-      disableRow,
-      setPage,
-      getCheckedRows,
-      getTableData,
-      setTableData
-    }));
-
-    const handleSelected = (column, row, value) => {
-      row[column.id] = value;
-      props.onValueChanged && props.onValueChanged(column, row);
+      props.onCellClick && props.onCellClick(column, row, row[column.id]);
     }
     const handleInput = (column, row, value) => {
       row[column.id] = value;
       props.onValueChanged && props.onValueChanged(column, row);
     }
-    const handleCellButtonClick = (column, row) => {
-      props.onCellButtonClicked && props.onCellButtonClicked(column, row);
-    }
-    const handleChecked = (e, column, row) => {
-      const { checked } = e.target;
-      if (allCheckChildRef.current) {
-        if (!checked) {
-          setAllChecked(false);
-          allCheckChildRef.current.setCheckedState(false);
-        }
-      }
-      row[column.id] = checked;
-      row.checked = checked;
-      props.onCellChecked && props.onCellChecked(checked, column, row);
-    }
-    const handleRadioChange = (e, column, row) => {
-    }
-    const handleAllChecked = (e, column) => {
-      const { checked } = e.target;
-      setAllChecked(checked);
-      if (childRef.current) {
-        childRef.current.setCheckedState(checked);
-      }
-      props.onAllChecked && props.onAllChecked(checked);
-    }
 
     const makeCellEl = (column, row) => {
       if (column.template) {
         return column.template(row);
-      } else if (column.type === 'checkbox') {
-        return <CheckBox 
-          ref={childRef} 
-          id={`${id}_${row.index}_${column.id}`}
-          onChange={(e) => handleChecked(e, column, row)} 
-        />
-      } else if (column.type === 'radio') {
-        return <Radio 
-          ref={childRef}
-          id={`${id}_${row.index}_${column.id}`}
-          name={`${id}_${column.id}`}
-          label=""
-          onChange={(e) => handleRadioChange(e, column, row)}
-        />
-      } else if (column.type === 'select') {
-        return <Select 
-          id={`${id}_${row.index}_${column.id}`}
-          options={column.options} 
-          value={column.useNull ? null : row[column.id]} 
-          style={{width: 'auto'}}
-          useNull={column.useNull}
-          onChange={(value) => handleSelected(column, row, value)}
-        />
       } else if (column.type === 'edit' && column.editable) {
         return <Input 
           id={`${id}_${row.index}_${column.id}`}
@@ -321,12 +165,6 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
           value={row[column.id]}
           style={{width: 'auto'}}
           onInput={(value) => handleInput(column, row, value)}
-        />
-      } else if (column.type === 'button') {
-        return <Button 
-          label={column.button.label}
-          style={{width: 'auto'}}
-          onClick={() => handleCellButtonClick(column, row)}
         />
       }
       return <span className={'cell-data'}>{row[column.id]}
@@ -340,46 +178,6 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
     const makeHeadEl = (column, index) => {
       const { type } = column;
       switch(type) {
-        case 'checkbox':
-          return <th
-            key={index}
-            style={column.header?.style}
-            colSpan={column.children && column.children.length}
-            rowSpan={column.children && maxChildDepth}
-          >
-            <CheckBox onChange={(e) => handleAllChecked(e, column)} ref={allCheckChildRef} />
-          </th>
-        case 'tooltip':
-          return <th
-            key={index}
-            style={column.header?.style}
-            colSpan={column.children && column.children.length}
-            rowSpan={column.children && maxChildDepth}
-          >
-            {
-              !column.tooltip?.suffix && 
-                <Tooltip text={column.tooltip?.text} 
-                  position={column.tooltip.position}
-                  tooltipStyle={column.tooltip.customStyle}
-                >
-                  {
-                    column.tooltip?.icon && <FontAwesomeIcon icon={column.tooltip?.icon} />
-                  }
-                </Tooltip>
-            }
-            <span className="th-tooltip-text" dangerouslySetInnerHTML={{__html: column.label}} />
-            {
-              column.tooltip?.suffix === true && 
-                <Tooltip text={column.tooltip?.text} 
-                  position={column.tooltip.position}
-                  tooltipStyle={column.tooltip.customStyle}
-                >
-                  {
-                    column.tooltip?.icon && <FontAwesomeIcon icon={column.tooltip?.icon} />
-                  }
-                </Tooltip>
-            }
-          </th>
         default:
           return <th key={index}
               style={column.header?.style}
@@ -493,16 +291,8 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                     }
                 </tbody>
             </TableWrapper>
-            {
-                page && page.usePage && 
-                <PagingToolbar 
-                  totalPage={totalPages} 
-                  page={currentPage}
-                  onPageChange={handlePageNumberClick} 
-                />
-            }
         </>
     )
-})
+}
 
 export default Table;

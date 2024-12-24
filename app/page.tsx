@@ -1,7 +1,15 @@
+import { Container } from "./styled";
 export default function Home() {
   return (
-    <div>
-      Home
-    </div>
+    <Container>
+      <aside>
+        <ul>
+          <li></li>
+        </ul>
+      </aside>
+      <main>
+
+      </main>
+    </Container>
   );
 }
