@@ -6,6 +6,12 @@ const Container = styled.div`
     background-color: #f0f0f0;
     display: flex;
     justify-content: space-between;
+    .flex {
+        display: flex;
+        &.space-between {
+            justify-content: space-between;
+        }
+    }
 `;
 
 export { Container };
