@@ -1,7 +1,7 @@
+"use client"
 import React, { useEffect, useRef, useState } from "react";
 import DateRangePicker from "react-bootstrap-daterangepicker";
 import 'bootstrap-daterangepicker/daterangepicker.css';
-import "react-datepicker/dist/react-datepicker.css";
 import styled from "styled-components";
 import { DateFormat } from "../common/util";
 import Select from "./Select";
@@ -47,13 +47,10 @@ const DatePickerWrapper = styled.div`
       opacity: 0.5;
     }
     .display-button {
-      width: 180px;
       line-height: 20px;
       font-size: 14px;
       color: #333;
-      &.wide {
-        width: 260px;
-      }
+      padding: 0 10px;
     }
   .date-picker-container {
     display: flex;
@@ -127,12 +124,11 @@ const DatePickerWrapper = styled.div`
 `;
 
 const DateRangePickerComponent = ({ 
-  label, 
-  rangable = true, 
-  type = null, 
+  label = '', 
+  type = '', 
   id = '',
-  onDateChange = () => {}, 
-  ...props 
+  onDateChange = () => {},
+  ...props
 }) => {
   const [displayRange, setDisplayRange] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
@@ -147,7 +143,7 @@ const DateRangePickerComponent = ({
 
   const format = props.format || {
     'month': 'yyyy/MM',
-    'time': 'yyyy/MM/dd hh:mm',
+    'time': 'yyyy/MM/dd hh:mm:ss',
   }[type] || 'yyyy/MM/dd';
   const handleDateRangeChanged = (event, picker) => {
     const _startDate = DateFormat(new Date(picker.startDate), format);
@@ -244,7 +240,7 @@ const DateRangePickerComponent = ({
           label && <span className='datepicker-label'>{label}</span>
       }
       {
-        (!type || type === 'time') && rangable &&  
+        (!type || type === 'time') &&  
           <div className="date-picker-container">
             <DateRangePicker 
               onApply={handleDateRangeChanged}
@@ -262,7 +258,7 @@ const DateRangePickerComponent = ({
                 cancelLabel: '취소'
               }}
             >
-              <button className={`display-button ${type === 'time' ? 'wide' : ''}`} disabled={disabled}>{displayRange}</button>
+              <button className={`display-button`} disabled={disabled}>{displayRange}</button>
             </DateRangePicker>
           </div>
       }

@@ -1,17 +1,14 @@
+"use client"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { Children } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import PushIcon from '../assets/images/icons/ico_push.svg';
-import SmsIcon from '../assets/images/icons/ico_sms.svg';
-import RcsIcon from '../assets/images/icons/ico_rcs.svg';
-import KakaoIcon from '../assets/images/icons/ico_kakao.svg';
 
 const StyledButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 160px;
-  height: 28px;
+  height: 32px;
   flex-shrink: 0;
   border-radius: 6px;
   background: #00653b;
@@ -279,26 +276,6 @@ const StyledButton = styled.button`
     }
     &.last-arrow {
       background-image: url("data:image/svg+xml,%3Csvg%20width%3D%2210%22%20height%3D%228%22%20viewBox%3D%220%200%2010%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M1.5%207L4.5%204L1.5%201%22%20stroke%3D%22%23464F60%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22M5.5%207L8.5%204L5.5%201%22%20stroke%3D%22%23464F60%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E");
-    }
-    &.ico-email {
-      margin-right: 4px;
-      background-image: url(${SmsIcon});
-    }
-    &.ico-push {
-      margin-right: 4px;
-      background-image: url(${PushIcon});
-    }
-    &.ico-chat {
-      margin-right: 4px;
-      background-image: url(${KakaoIcon});
-    }
-    &.ico-rcs {
-      margin-right: 4px;
-      background-image: url(${RcsIcon});
-    }
-    &.ico-sms {
-      margin-right: 4px;
-      background-image: url(${SmsIcon});
     }
   }
   .fa-icon {

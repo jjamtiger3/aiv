@@ -1,7 +1,7 @@
+"use client"
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { addStrToCursorPosition, getByteLength } from '../common/util';
-import { useStore } from 'react-redux';
 
 const InputWrapper = styled.div`
     display: -webkit-inline-box;
@@ -180,17 +180,17 @@ const InputWrapper = styled.div`
 `;
 
 const Input = forwardRef(({ 
-    type, 
+    type = '', 
     label = '', 
     size = 'small', 
     value = '', 
     id = '', 
+    placeholder = '',
     ...props 
 }, ref) => {
     const [focused, setFocused] = useState(false);
     const [inputValue, setInputValue] = useState(value || '');
     const [notFocusedValue, setNotFocusedValue] = useState(false);
-    const store = useStore();
     const fieldsetRef = useRef(null);
     const inputRef = useRef(null);
     const handleMouseOver = (e) => {
@@ -263,33 +263,6 @@ const Input = forwardRef(({
         blur
     }));
     useEffect(() => {
-        const unsubscribe = store.subscribe(() => {
-            const { lastAction } = store.getState().common;
-            const templateState = store.getState().template;
-            switch (lastAction) {
-                case 'ON_UPDATE_ROW':
-                    if (id) {
-                        const arrProps = id.split('_');
-                        const inputValue = store.getState().common.payload.row[arrProps[arrProps.length - 1]];
-                        setInputValue(inputValue);
-                    }
-                    break;
-              default:
-                    break;
-            }
-            switch (templateState.lastAction) {
-                case 'ON_FOCUS':
-                    if (id === templateState.target) {
-                        inputRef.current.focus();
-                    }
-                    break;
-                default:
-                    break;
-            }
-          });
-          return () => {
-            unsubscribe();
-          }
     }, []);
     useEffect(() => {
         setInputValue(value);
@@ -322,7 +295,7 @@ const Input = forwardRef(({
                     readOnly={props.readOnly}
                     disabled={props.disabled}
                     required={props.required}
-                    placeholder={props.placeholder}
+                    placeholder={placeholder}
                     type={type && type !== 'number' ? type : 'text'}
                     ref={inputRef}
                     value={inputValue}
