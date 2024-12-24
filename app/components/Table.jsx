@@ -134,15 +134,6 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
         });
         return max + 1;
     }
-    // columns의 갯수와 columns의 children의 갯수를 합함
-    const maxColumns = (columns) => {
-        let count = 0;
-        columns.forEach((column) => {
-            count += column.children ? column.children.length : 1;
-        });
-        return count;
-    };
-    const maxChildDepth = maxDepth(columns);
 
     const handleRowClick = (row, rowIndex) => {
         props.onRowClick && props.onRowClick(row, rowIndex);
@@ -180,42 +171,12 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
       switch(type) {
         default:
           return <th key={index}
-              style={column.header?.style}
-              colSpan={column.children && column.children.length}
-              rowSpan={column.children ? 1 : maxChildDepth}
+              style={column.style}
               dangerouslySetInnerHTML={{__html: column.label}}
           />
       }
     }
 
-    const makeSum = (sum, summaryStyle = { fontWeight: '700', height: 40 }) => {
-      return (
-        <tr>
-          {
-            // 모든 행의 각 컬럼 값을 더함
-            columns.map((column, columnIndex) => {
-              if (columnIndex === 0) {
-                return <td key={columnIndex} style={{...column.style, ...summaryStyle}}>{sum.title}</td>
-              }
-              if (column.type === 'number') {
-                if (column.children) {
-                  return column.children.map((child, childIndex) => {
-                    return <td 
-                      key={childIndex}
-                      style={{...column.style, ...summaryStyle}}
-                    >
-                        {rows.reduce((acc, row) => acc + row[child.id], 0).toFixed(column.toFixed || 0)}
-                      </td>
-                  })
-                }
-                return <td key={columnIndex} style={{...column.style, ...summaryStyle}}>{rows.reduce((acc, row) => acc + row[column.id], 0).toFixed(column.toFixed || 0)}</td>
-              }
-              return <td key={columnIndex} style={{...column.style, ...summaryStyle}} />
-            })
-          }
-        </tr>
-      )
-    }
     return (
         <>
             <TableWrapper borderstyle={border} 
@@ -231,26 +192,11 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
                           makeHeadEl(column, index)
                         ))}
                     </tr>
-                    {
-                      maxChildDepth > 1 && <tr className={'header'}>
-                        {
-                          columns.map((column) => {
-                            if (column.children) {
-                              return column.children.map((child, index) => (
-                                <th key={index}
-                                  style={child.header?.style}
-                                >{child.label}</th>
-                              ))
-                            }
-                          })
-                        }
-                      </tr>
-                    }
                 </thead>
                 <tbody>
                     {
                         tableData.length === 0 && <tr>
-                            <td className={'empty-cell'} colSpan={maxColumns(columns)}>{emptyMessage}</td>
+                            <td className={'empty-cell'}>{emptyMessage}</td>
                         </tr>
                     }
                     {tableData.map((row, rowIndex) => (
@@ -260,7 +206,7 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
                         >
                             {
                               columns.map((column, columnIndex) => (
-                                !column.children ? <td key={columnIndex}
+                                <td key={columnIndex}
                                       className={'cell'}
                                       style={column.style && column.style}
                                       onClick={() => handleCellClick(column, row)}
@@ -269,26 +215,10 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
                                           makeCellEl(column, row)
                                       }
                                   </td>
-                                  :
-                                  column.children.map((child, childIndex) => {
-                                    return <td key={childIndex}
-                                      className={'cell'}
-                                      style={child.style && child.style}
-                                      onClick={() => handleCellClick(child, row)}
-                                      >
-                                      {child.template ? child.template(row) : <span className={'cell-data'}>{row[child.id]}</span>}
-                                      {
-                                        child.suffix && child.suffix
-                                      }
-                                      </td>
-                                  })
                               ))
                             }
                         </tr>
                     ))}
-                    {
-                      summary && summary.sum && makeSum(summary.sum, summary.style)
-                    }
                 </tbody>
             </TableWrapper>
         </>

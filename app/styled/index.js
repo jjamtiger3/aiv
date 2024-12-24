@@ -53,6 +53,41 @@ const Container = styled.div`
             align-items: center;
         }
     }
+    /* 로딩 오버레이: 화면 중앙에 투명한 배경 */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5); /* 반투명 검정 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999; /* 다른 요소 위에 표시 */
+    }
+
+    /* 로딩 스피너: 원형 */
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.3); /* 투명한 테두리 */
+      border-top: 5px solid white; /* 흰색 회전 부분 */
+      border-radius: 50%;
+      animation: spin 1s linear infinite; /* 회전 애니메이션 */
+    }
+
+    /* 회전 애니메이션 */
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+
 `;
 
 export { Container };
