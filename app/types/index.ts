@@ -7,5 +7,9 @@ interface Post {
 interface PostPageProps {
     params: { id: string };
 }
+interface Menu {
+    id: number;
+    name: string;
+}
 
-export type { Post, PostPageProps };
+export type { Post, PostPageProps, Menu };

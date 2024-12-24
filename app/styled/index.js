@@ -6,6 +6,9 @@ const Container = styled.div`
     height: 100vh;
     background-color: #f0f0f0;
     padding: 10px;
+    aside {
+        width: 300px;
+    }
     .search-bar {
         height: 32px;
         padding: 10px 0;
@@ -15,6 +18,9 @@ const Container = styled.div`
         display: flex;
         &.column {
             flex-direction: column;
+        }
+        &.left {
+            justify-content: flex-start;
         }
         &.space-between {
             justify-content: space-between;
