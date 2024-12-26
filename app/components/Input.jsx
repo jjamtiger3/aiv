@@ -2,6 +2,9 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { addStrToCursorPosition, getByteLength } from '../common/util';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
+import { faXmark } from '@fortawesome/free-solid-svg-icons/faXmark';
 
 const InputWrapper = styled.div`
     display: -webkit-inline-box;
@@ -34,6 +37,9 @@ const InputWrapper = styled.div`
     }
     &.full-size {
         width: 100%;
+    }
+    .search-icon {
+        margin-left: 10px;
     }
     &.disabled {
         user-select: none;
@@ -292,6 +298,9 @@ const Input = forwardRef(({
                 onMouseOver={handleMouseOver}
                 onMouseLeave={handleMouseLeave}
             >
+                {
+                    type === 'search' && <FontAwesomeIcon className='search-icon' icon={faSearch} />
+                }
                 <input 
                     readOnly={props.readOnly}
                     disabled={props.disabled}

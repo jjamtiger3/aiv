@@ -8,6 +8,11 @@ import Button from "./components/Button";
 import Table from "./components/Table";
 import useApi from "./common/request";
 import { MenuProps, LineDataProps, TableColumnProps, TableDataProps, TableRowDataProps } from "./types";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleCheck } from "@fortawesome/free-solid-svg-icons/faCircleCheck";
+import { faBan, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons/faCircleExclamation";
+import { faStopCircle } from "@fortawesome/free-regular-svg-icons";
 
 export default function Home() {
   const date = new Date();
@@ -85,6 +90,18 @@ const tableRef = useRef(null);
           width
         }
       } as TableColumnProps;
+      if (index === 1) {
+        _column.template = (row: TableDataProps) => {
+          return <td className={`cell`} style={_column.style}>
+            <span>{
+            row.ng ? 
+              <FontAwesomeIcon icon={faBan} className="ng-icon" />
+              :
+              <FontAwesomeIcon icon={faCircleCheck} className="ok-icon" />
+            }</span>
+          </td>
+        }
+      }
       if (index > 3) {
         _column.template = (row: TableDataProps) => {
           let value = row.data[index - 4]?.value;
@@ -170,7 +187,10 @@ const tableRef = useRef(null);
           />
         </div>
         <div className="flex middle">
-          <Input placeholder="Sample ID를 입력하세요" onInput={(value) => setSearchValue(value)} />
+          <Input 
+            type="search"
+            placeholder="Sample ID를 입력하세요" 
+            onInput={(value) => setSearchValue(value)} />
           <Button label="Search" outline={true} onClick={handleSearch} />
         </div>
       </div>

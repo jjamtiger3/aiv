@@ -117,6 +117,12 @@ const TableWrapper = styled.table`
               background-color: #ffcccc;
               color: #222;
             }
+            .ng-icon {
+              color: #ff0000;
+            }
+            .ok-icon {
+              color: #006611;
+            }
             .icon-circle {
                 width: 30px;
                 height: 30px;
