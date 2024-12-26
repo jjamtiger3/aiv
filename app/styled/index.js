@@ -7,6 +7,7 @@ const Container = styled.div`
     padding: 10px;
     aside {
         width: 300px;
+        margin-right: 20px;
         .title {
             font-size: 20px;
             font-weight: 700;
