@@ -7,6 +7,7 @@ import { faSort } from "@fortawesome/free-solid-svg-icons/faSort";
 import { faSortDesc } from "@fortawesome/free-solid-svg-icons/faSortDesc";
 import { faSortAsc } from "@fortawesome/free-solid-svg-icons/faSortAsc";
 import { faFilter } from "@fortawesome/free-solid-svg-icons/faFilter";
+import { DateFormat } from "../common/util";
 
 const TableWrapper = styled.table`
     width: 100%;
@@ -200,6 +201,11 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
           style={{width: 'auto'}}
           onInput={(value) => handleInput(column, row, value)}
         />
+      } else if (column.type === 'date') {
+        const dateFormat = column.dateFormat || 'yyyy-MM-dd';
+        return <span className={'cell-data'}>{
+          DateFormat(new Date(row[column.id]), dateFormat)
+        }</span>;
       }
       return <span className={'cell-data'}>{row[column.id]}
       {

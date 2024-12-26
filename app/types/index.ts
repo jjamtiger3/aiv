@@ -55,6 +55,8 @@ interface TableColumnProps {
     sortable?: boolean;
     decimal?: number;
     children?: TableColumnProps[];
+    type?: string;
+    dateFormat?: string;
     template?: (row: any) => React.ReactNode;
     suffix?: string;
 }

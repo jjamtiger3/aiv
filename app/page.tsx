@@ -78,6 +78,8 @@ const tableRef = useRef(null);
         useFilter: index < 3 ? true : false,
         sortable: index === 3 ? true : false,
         decimal: column.option?.decimal || null,
+        type: index === 3 ? 'date' : 'text',
+        dateFormat: index === 3 ? 'yyyy.MM.dd hh:mm:ss' : null,
         style: {
           width
         }
