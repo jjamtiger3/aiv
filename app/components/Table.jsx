@@ -127,6 +127,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
     const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || '데이터가 없습니다.');
 
     const [tableData, setTableData] = useState(rows);
+    const [displayData, setDisplayData] = useState(rows);
     const [tableColumns, setTableColumns] = useState(columns);
 
     useEffect(() => {
@@ -139,9 +140,14 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
       }));
       setTableData(updatedRows);
     }, [rows]);
+
     useEffect(() => {
       setTableColumns(columns);
     }, [columns]);
+
+    useEffect(() => {
+      setDisplayData(tableData);
+    }, [tableData]);
 
     const setTableRows = (rows) => {
       setTableData(rows);
@@ -242,6 +248,20 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
       // columns에서 index에 해당하는 컬럼을 찾아서 변경
       const updatedColumns = tableColumns.map((c, i) => i === index ? column : c);
       setTableColumns(updatedColumns);
+      const sortableData = [...displayData];
+      const sortKey = column.id;
+      const sortDirection = column.sort;
+      sortableData.sort((a, b) => {
+        if (a[sortKey] < b[sortKey]) {
+          return sortDirection === "asc" ? -1 : 1;
+        }
+        if (a[sortKey] > b[sortKey]) {
+          return sortDirection === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+      console.log(sortableData)
+      setDisplayData(sortableData);
       props.onHeaderClick && props.onHeaderClick(column, index);
     }
 
@@ -279,11 +299,11 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                 </thead>
                 <tbody onScroll={debounce(handleScroll, 100)}>
                     {
-                        tableData.length === 0 && <tr>
+                        displayData.length === 0 && <tr>
                             <td className={'empty-cell'}>{emptyMessage}</td>
                         </tr>
                     }
-                    {tableData.map((row, rowIndex) => (
+                    {displayData.map((row, rowIndex) => (
                         <tr className={`row ${rowIndex % 2 === 1 ? 'stripped' : ''} ${row.disabled ? 'disabled' : ''}`} key={rowIndex}
                             style={{height: `${rowHeight || 22}px`}}
                             onClick={() => handleRowClick(row, rowIndex)}
