@@ -1,10 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import Input from "./Input";
+import { debounce } from "../common/util";
 
 const TableWrapper = styled.table`
     width: 100%;
     border-collapse: collapse;
+    tbody {
+      display: block;
+      max-height: ${(props) => `${props.style?.height || '300px'}`};
+      overflow-y: auto;
+    }
+    thead, tbody tr {
+      display: table;
+      width: 100%;
+    }
     .header {
         th {
             border-width: ${(props) => `${props.headerstyle?.border?.width || 1}px`};
@@ -107,6 +117,7 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
     const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || '데이터가 없습니다.');
 
     const [tableData, setTableData] = useState(rows);
+
     useEffect(() => {
       if (!rows || rows.length === 0) {
         return;
@@ -160,6 +171,17 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
       }
     }
 
+    const handleScroll = (e) => {
+      // tbody에서 스크롤이 제일 밑으로왔는지 체크
+      const tbody = e.target;
+      const scrollTop = tbody.scrollTop;
+      const scrollHeight = tbody.scrollHeight;
+      const clientHeight = tbody.clientHeight;
+      if (scrollTop + clientHeight >= scrollHeight) {
+        props.onScrollBottom && props.onScrollBottom(e);
+      }
+    }
+
     return (
         <>
             <TableWrapper borderstyle={border} 
@@ -176,7 +198,7 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
                         ))}
                     </tr>
                 </thead>
-                <tbody>
+                <tbody onScroll={debounce(handleScroll, 100)}>
                     {
                         tableData.length === 0 && <tr>
                             <td className={'empty-cell'}>{emptyMessage}</td>

@@ -167,6 +167,15 @@ const handleDownload = (url, fileName) => {
     document.body.removeChild(link);
 };
 
+// 유틸리티: debounce 함수
+const debounce = (func, delay) => {
+    let timer;
+    return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
 export { 
     DateFormat,
     StrToDate,
@@ -178,5 +187,6 @@ export {
     validateEmail,
     getDateByOffset,
     handleDownload,
-    getRandomNumber
+    getRandomNumber,
+    debounce
 }

@@ -13,13 +13,32 @@ export default function Home() {
   const date = new Date();
   const [startDate, setStartDate] = useState(new Date(`${DateFormat(date, 'yyyy. MM. dd')} 00:00:00`));
   const [endDate, setEndDate] = useState(new Date(`${DateFormat(date, 'yyyy. MM. dd')} 23:59:59`));
-  const [menuList, setMenuList] = useState<MenuProps[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
+
+  const [menuList, setMenuList] = useState<MenuProps[]>([]);
   const [tableColumns, setTableColumns] = useState<TableColumnProps[]>([]);
   const [tableRows, setTableRows] = useState<TableDataProps[]>([]);
+
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentId, setCurrentId] = useState<number>(-1);
 
   const { get, loading } = useApi();
+  const tableConfig = {
+    rowHeight: 40,
+    header: {
+        height: 40,
+        border: {
+            width: 1,
+            color: '#f0f0f0',
+            style: 'solid'
+        }
+    },
+    border: {
+        width: 1,
+        color: '#f0f0f0',
+        style: 'solid'
+    },
+}
 
   useEffect(() => {
     const fetchMenuList = async () => {
@@ -69,10 +88,10 @@ export default function Home() {
     setTableColumns(newTableColumns);
   }
 
-  const fetchLineData = async (id: number) => {
+  const fetchLineData = async (id: number, page: number) => {
     const url = `/api/v1/report/pages/${id}/samples`;
     const query = {
-      page: currentPage,
+      page,
       limit: 20,
       startAt: new Date(startDate).toISOString(),
       endAt: new Date(endDate).toISOString(),
@@ -81,12 +100,19 @@ export default function Home() {
     }
     const res = await get(url, query);
     const list: TableDataProps[] = res.list;
-    setTableRows(list);
+    if (list.length === 0) {
+      return;
+    } else if (list.length > 0) {
+      setCurrentPage(page);
+    }
+    const newTableRows = [...tableRows, ...list];
+    setTableRows(newTableRows);
   }
 
   const handleMenuClick = async (id: number) => {
+    setCurrentId(id);
     await fetchLineColumns(id);
-    await fetchLineData(id);
+    await fetchLineData(id, 1);
   }
 
   const handleSearch = async () => {
@@ -94,10 +120,12 @@ export default function Home() {
   }
 
   const handleDateChange = (startDate: Date, endDate: Date) => {
-    console.log(DateFormat(startDate, 'yyyy. MM. dd hh:mm:ss'))
-    console.log(DateFormat(endDate, 'yyyy. MM. dd hh:mm:ss'))
     setStartDate(DateFormat(startDate, 'yyyy. MM. dd hh:mm:ss'));
     setEndDate(DateFormat(endDate, 'yyyy. MM. dd hh:mm:ss'));
+  }
+
+  const handleScrollBottom = () => {
+    fetchLineData(currentId, currentPage + 1);
   }
 
   return (
@@ -138,7 +166,9 @@ export default function Home() {
         </aside>
         <main>
           <p>Line Name</p>
-          <Table columns={tableColumns} rows={tableRows} />
+          <div>
+            <Table columns={tableColumns} rows={tableRows} config={tableConfig} onScrollBottom={handleScrollBottom} />
+          </div>
         </main>
       </div>
     </Container>
