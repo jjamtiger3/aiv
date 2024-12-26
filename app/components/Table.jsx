@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Input from "./Input";
 
@@ -106,11 +106,9 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
     const { rowHeight, border, header, customClass, page, row, stripped, summary } = config;
     const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || '데이터가 없습니다.');
 
-
     const [tableData, setTableData] = useState(rows);
     useEffect(() => {
       if (!rows || rows.length === 0) {
-        setTableData([]);
         return;
       }
       const updatedRows = rows.map((row, index) => ({
@@ -119,21 +117,6 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
       }));
       setTableData(updatedRows);
     }, [rows]);
-    // columns 의 children depth계산
-    // columns의 각 요소는 children을 가질수있음
-    // children의 각 child는 children을 가질 수 있음
-    const maxDepth = (columns) => {
-        let max = 0;
-        columns.forEach((column) => {
-            if (column.children) {
-                const depth = maxDepth(column.children);
-                if (depth > max) {
-                    max = depth;
-                }
-            }
-        });
-        return max + 1;
-    }
 
     const handleRowClick = (row, rowIndex) => {
         props.onRowClick && props.onRowClick(row, rowIndex);
@@ -206,7 +189,7 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
                         >
                             {
                               columns.map((column, columnIndex) => (
-                                <td key={columnIndex}
+                                  <td key={`header_${columnIndex}`}
                                       className={'cell'}
                                       style={column.style && column.style}
                                       onClick={() => handleCellClick(column, row)}

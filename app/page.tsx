@@ -7,7 +7,7 @@ import Input from "./components/Input";
 import Button from "./components/Button";
 import Table from "./components/Table";
 import useApi from "./common/request";
-import { MenuProps, LineDataProps, TableColumnProps, TableDataProps } from "./types";
+import { MenuProps, LineDataProps, TableColumnProps, TableDataProps, TableRowDataProps } from "./types";
 
 export default function Home() {
   const date = new Date();
@@ -52,14 +52,20 @@ export default function Home() {
         2: 'sampleId',
         3: 'inspectedAt',
       }[index];
-      newTableColumns.push({
+      const _column = {
         label,
         id,
         style: {
           width
         }
-      })
-    })
+      } as any;
+      if (index > 3) {
+        _column.template = (row: TableDataProps) => {
+          return row.data[index - 4]?.value || '';
+        }
+      }
+      newTableColumns.push(_column);
+    });
     setTableColumns(newTableColumns);
   }
 

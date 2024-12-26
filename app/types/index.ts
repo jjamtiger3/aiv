@@ -61,7 +61,11 @@ interface TableDataProps {
     productKey: string;
     ng: boolean;
     inspectedAt: string;
-    data: any[];
+    data: TableRowDataProps[];
+}
+interface TableRowDataProps {
+    value: string | boolean | number;
+    ng: boolean;
 }
 
-export type { Post, PostPageProps, MenuProps, LineDataProps, TableColumnProps, TableDataProps };
+export type { Post, PostPageProps, MenuProps, LineDataProps, TableColumnProps, TableDataProps, TableRowDataProps };
