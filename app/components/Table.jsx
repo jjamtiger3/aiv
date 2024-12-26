@@ -342,8 +342,10 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                             {
                               tableColumns.map((column, columnIndex) => (
                                   column.template ? 
-                                  <React.Fragment key={`header_${columnIndex}`} onClick={() => handleCellClick(column, row)}>
-                                    {column.template(row)}
+                                  <React.Fragment key={`header_${columnIndex}`}>
+                                    {React.cloneElement(column.template(row), {
+                                      onClick: () => handleCellClick(column, row),
+                                    })}
                                   </React.Fragment>
                                   :
                                   <td key={`header_${columnIndex}`}

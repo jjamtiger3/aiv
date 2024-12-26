@@ -7,6 +7,25 @@ const Container = styled.div`
     padding: 10px;
     aside {
         width: 300px;
+        .title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        ul {
+            margin: 20px 0 0 0;
+            padding: 0;
+            list-style: none;
+            li {
+                padding: 10px 20px;
+                border-bottom: 1px solid #f4f8fe;
+                cursor: pointer;
+                &:hover, &.active {
+                    color: #0157d8;
+                    background-color: #f4f8fe;
+                }
+            }
+        }
     }
     main {
         width: calc(100% - 300px);

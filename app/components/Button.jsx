@@ -11,8 +11,8 @@ const StyledButton = styled.button`
   height: 32px;
   flex-shrink: 0;
   border-radius: 6px;
-  background: #00653b;
-  color: #fff;
+  background: #f4f8fe;
+  color: #0157d8;
   border: none;
   cursor: pointer;
   position: relative;
@@ -30,18 +30,18 @@ const StyledButton = styled.button`
     color: #fff;
   }
   &.fa-icon-wrapper.outline {
-    background: #fff;
-    color: #00653b;
-    border: 1px solid #00653b;
+    background: #f4f8fe;
+    color: #0157d8;
+    border: 1px solid #0157d8;
     &:hover {
-      background: #00653b;
-      color: #fff;
+      background: #0157d8;
+      color: #f4f8fe;
     }
   }
   &.outline {
-    background-color: ${(props) => `${props.outlinestyle?.backgroundColor || '#fff'}`};
-    color: ${(props) => `${props.outlinestyle?.color || '#00653b'}`};
-    border: ${(props) => `${props.outlinestyle?.border || '1px solid #00653b'}`};
+    background-color: ${(props) => `${props.outlinestyle?.backgroundColor || '#f4f8fe'}`};
+    color: ${(props) => `${props.outlinestyle?.color || '#0157d8'}`};
+    border: ${(props) => `${props.outlinestyle?.border || '1px solid #0157d8'}`};
     &.tab {
       &:hover {
         background: #fff;
@@ -49,8 +49,8 @@ const StyledButton = styled.button`
       }
     }
     &:hover {
-      background-color: ${(props) => `${props.primarystyle?.backgroundColor || '#10A56E'}`};
-      color: ${(props) => `${props.primarystyle?.color || '#fff'}`};
+      background-color: ${(props) => `${props.primarystyle?.backgroundColor || '#0157d8'}`};
+      color: ${(props) => `${props.primarystyle?.color || '#f4f8fe'}`};
       border-color: ${(props) => `${props.primarystyle?.backgroundColor && props.primarystyle?.backgroundColor}`};
     }
   }

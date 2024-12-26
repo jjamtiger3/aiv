@@ -21,6 +21,7 @@ export default function Home() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currentId, setCurrentId] = useState<number>(-1);
+  const [currentMenuIndex, setCurrentMenuIndex] = useState<number>(-1);
 
   const { get, loading } = useApi();
   const tableConfig = {
@@ -131,8 +132,9 @@ const tableRef = useRef(null);
     }
   }
 
-  const handleMenuClick = async (id: number) => {
+  const handleMenuClick = async (id: number, index: number) => {
     setCurrentId(id);
+    setCurrentMenuIndex(index);
     await fetchLineColumns(id);
     await fetchLineData(id, 1, true);
   }
@@ -169,18 +171,19 @@ const tableRef = useRef(null);
         </div>
         <div className="flex middle">
           <Input placeholder="Sample ID를 입력하세요" onInput={(value) => setSearchValue(value)} />
-          <Button label="Search" onClick={handleSearch} />
+          <Button label="Search" outline={true} onClick={handleSearch} />
         </div>
       </div>
       <div className="flex left">
         <aside>
-          <span>Inspection Report Pages</span>
+          <span className="title">Inspection Report Pages</span>
           <ul>
             {
-              menuList.map((menu: MenuProps) => (
+              menuList.map((menu: MenuProps, index: number) => (
                 <li 
                   key={menu.id}
-                  onClick={() => {handleMenuClick(menu.id)}}
+                  className={index === currentMenuIndex ? 'active' : ''}
+                  onClick={() => {handleMenuClick(menu.id, index)}}
                 >{menu.name}</li>
               ))
             }

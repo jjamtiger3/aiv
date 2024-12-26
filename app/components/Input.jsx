@@ -18,7 +18,8 @@ const InputWrapper = styled.div`
     vertical-align: top;
     width: 200px;
     font-size: 14px;
-    border: 1px solid #e7e7e7;
+    border: 1px solid #e8eaf2;
+    color: #e8eaf2;
     &.readonly {
         background: #ebf1fb;
         border: 1px solid #b3bacb;
