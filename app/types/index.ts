@@ -52,6 +52,7 @@ interface TableColumnProps {
     id?: string;
     label?: string;
     style?: React.CSSProperties;
+    sortable?: boolean;
     children?: TableColumnProps[];
     template?: (row: any) => React.ReactNode;
     suffix?: string;

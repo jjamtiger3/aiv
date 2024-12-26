@@ -75,10 +75,11 @@ const tableRef = useRef(null);
       const _column = {
         label,
         id,
+        sortable: index === 3 ? true : false,
         style: {
           width
         }
-      } as any;
+      } as TableColumnProps;
       if (index > 3) {
         _column.template = (row: TableDataProps) => {
           return row.data[index - 4]?.value || '';

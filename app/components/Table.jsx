@@ -2,6 +2,10 @@ import React, { useEffect, useState, forwardRef, useImperativeHandle } from "rea
 import styled from "styled-components";
 import Input from "./Input";
 import { debounce } from "../common/util";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSort } from "@fortawesome/free-solid-svg-icons/faSort";
+import { faSortDesc } from "@fortawesome/free-solid-svg-icons/faSortDesc";
+import { faSortAsc } from "@fortawesome/free-solid-svg-icons/faSortAsc";
 
 const TableWrapper = styled.table`
     width: 100%;
@@ -35,6 +39,12 @@ const TableWrapper = styled.table`
             }
             &:last-child {
                 border-right: none;
+            }
+            &.sortable {
+                cursor: pointer;
+                .sortable-icon {
+                  margin-left: 4px;
+                }
             }
         }
         height: ${(props) => `${props.headerstyle?.height}px` || '24px'};
@@ -113,10 +123,11 @@ const TableWrapper = styled.table`
     ${(props) => props.customclass}
 `
 const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, ...props }, ref) => {
-    const { rowHeight, border, header, customClass, page, row, stripped, summary } = config;
+    const { rowHeight, border, header, customClass, row, stripped } = config;
     const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || '데이터가 없습니다.');
 
     const [tableData, setTableData] = useState(rows);
+    const [tableColumns, setTableColumns] = useState(columns);
 
     useEffect(() => {
       if (!rows || rows.length === 0) {
@@ -128,6 +139,9 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
       }));
       setTableData(updatedRows);
     }, [rows]);
+    useEffect(() => {
+      setTableColumns(columns);
+    }, [columns]);
 
     const setTableRows = (rows) => {
       setTableData(rows);
@@ -176,11 +190,59 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
       const { type } = column;
       switch(type) {
         default:
-          return <th key={index}
+          return (
+            <th key={index}
               style={column.style}
-              dangerouslySetInnerHTML={{__html: column.label}}
-          />
+              className={column.sortable ? 'sortable' : ''}
+              onClick={() => handleHeaderClick(column, index)}
+              >
+              <span>
+                {column.label}
+              </span>
+              {
+                column.sortable && (!column.sort || column.sort === 'none') &&
+                <span className="sortable-icon">
+                  <FontAwesomeIcon icon={faSort} />
+                </span>
+              }
+              {
+                column.sortable && column.sort === 'desc' &&
+                <span className="sortable-icon">
+                  <FontAwesomeIcon icon={faSortDesc} />
+                </span>
+              }
+              {
+                column.sortable && column.sort === 'asc' &&
+                <span className="sortable-icon">
+                  <FontAwesomeIcon icon={faSortAsc} />
+                </span>
+              }
+            </th>
+          )
       }
+    }
+
+    const handleHeaderClick = (column, index) => {
+      if (column.sortable) {
+        switch(column.sort) {
+          case 'desc':
+            column.sort = 'asc';
+            break;
+          case 'asc':
+            column.sort = 'none';
+            break;
+          case 'none':
+            column.sort = 'desc';
+            break;
+          default:
+            column.sort = 'desc';
+            break;
+        }
+      }
+      // columns에서 index에 해당하는 컬럼을 찾아서 변경
+      const updatedColumns = tableColumns.map((c, i) => i === index ? column : c);
+      setTableColumns(updatedColumns);
+      props.onHeaderClick && props.onHeaderClick(column, index);
     }
 
     const handleScroll = (e) => {
@@ -210,7 +272,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
               >
                 <thead>
                     <tr className={'header'}>
-                        {columns.map((column, index) => (
+                        {tableColumns.map((column, index) => (
                           makeHeadEl(column, index)
                         ))}
                     </tr>
@@ -227,7 +289,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                             onClick={() => handleRowClick(row, rowIndex)}
                         >
                             {
-                              columns.map((column, columnIndex) => (
+                              tableColumns.map((column, columnIndex) => (
                                   <td key={`header_${columnIndex}`}
                                       className={'cell'}
                                       style={column.style && column.style}
