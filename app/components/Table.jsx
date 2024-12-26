@@ -11,6 +11,7 @@ import { faFilter } from "@fortawesome/free-solid-svg-icons/faFilter";
 const TableWrapper = styled.table`
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
     tbody {
       display: block;
       max-height: ${(props) => `${props.style?.height || '300px'}`};
@@ -22,6 +23,10 @@ const TableWrapper = styled.table`
     }
     .header {
         th {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          height: ${(props) => `${props.headerstyle?.height}px` || '40px'};
             border-width: ${(props) => `${props.headerstyle?.border?.width || 1}px`};
             border-style: ${(props) => `${props.headerstyle?.border?.style || 'solid'}`};
             border-color: ${(props) => `${props.headerstyle?.border?.color || '#aaa'}`};
@@ -93,7 +98,10 @@ const TableWrapper = styled.table`
             }
         }
         .cell {
-            border-bottom: ${(props) => `${props.borderstyle?.borderBottom || '1px solid #eaeaea'}`};
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+            border-bottom: ${(props) => `${props.borderstyle?.borderBottom || '0px solid #eaeaea'}`};
             border-right: ${(props) => `${props.borderstyle?.borderBottom || '1px solid #eaeaea'}`};
             padding: ${(props) => `${props.rowstyle?.style?.padding || '4px'}`};
             font-size: ${(props) => `${props.cellstyle?.style?.fontSize || '12px'}`}; 
@@ -103,6 +111,10 @@ const TableWrapper = styled.table`
                 svg {
                     margin-right: 10px;
                 }
+            }
+            &.ng {
+              background-color: #ffcccc;
+              color: #222;
             }
             .icon-circle {
                 width: 30px;
@@ -180,9 +192,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
     }
 
     const makeCellEl = (column, row) => {
-      if (column.template) {
-        return column.template(row);
-      } else if (column.type === 'edit' && column.editable) {
+      if (column.type === 'edit' && column.editable) {
         return <Input 
           id={`${id}_${row.index}_${column.id}`}
           columnid={column.id}
@@ -209,12 +219,15 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
               className={[column.sortable ? 'sortable' : '', column.useFilter ? 'filterable' : ''].join(' ')}
               onClick={() => handleHeaderClick(column, index)}
               >
-              <span>
-                {column.label}
-              </span>
+                {
+                  column.label &&
+                  <span>
+                    {column.label}
+                  </span>
+                }
               {
                 column.useFilter &&
-                <span className="filter-icon">
+                <span className={column.label ? 'filter-icon' : ''}>
                   <FontAwesomeIcon icon={faFilter} />
                 </span>
               }
@@ -294,7 +307,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
     }));
 
     return (
-        <>
+        <div style={{overflowX: 'auto', width: '100%'}}>
             <TableWrapper borderstyle={border} 
               headerstyle={header} 
               rowstyle={row} 
@@ -322,6 +335,11 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                         >
                             {
                               tableColumns.map((column, columnIndex) => (
+                                  column.template ? 
+                                  <React.Fragment key={`header_${columnIndex}`} onClick={() => handleCellClick(column, row)}>
+                                    {column.template(row)}
+                                  </React.Fragment>
+                                  :
                                   <td key={`header_${columnIndex}`}
                                       className={'cell'}
                                       style={column.style && column.style}
@@ -337,7 +355,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                     ))}
                 </tbody>
             </TableWrapper>
-        </>
+        </div>
     )
 });
 

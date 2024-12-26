@@ -53,6 +53,7 @@ interface TableColumnProps {
     label?: string;
     style?: React.CSSProperties;
     sortable?: boolean;
+    decimal?: number;
     children?: TableColumnProps[];
     template?: (row: any) => React.ReactNode;
     suffix?: string;

@@ -77,13 +77,25 @@ const tableRef = useRef(null);
         id,
         useFilter: index < 3 ? true : false,
         sortable: index === 3 ? true : false,
+        decimal: column.option?.decimal || null,
         style: {
           width
         }
       } as TableColumnProps;
       if (index > 3) {
         _column.template = (row: TableDataProps) => {
-          return row.data[index - 4]?.value || '';
+          let value = row.data[index - 4]?.value;
+          const isNG = row.data[index - 4]?.ng;
+          // value가 숫자형인지 체크
+          if (typeof value === 'number') {
+            value = value.toFixed(_column.decimal);
+          }
+          return <td
+            className={`cell ${isNG ? 'ng' : ''}`}
+            style={_column.style}
+          >
+            <span>{value || '결과 없음'}</span>
+          </td>
         }
       }
       newTableColumns.push(_column);
