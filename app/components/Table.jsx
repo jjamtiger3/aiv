@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import styled from "styled-components";
 import Input from "./Input";
 import { debounce } from "../common/util";
@@ -112,7 +112,7 @@ const TableWrapper = styled.table`
     }
     ${(props) => props.customclass}
 `
-const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props }) => {
+const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, ...props }, ref) => {
     const { rowHeight, border, header, customClass, page, row, stripped, summary } = config;
     const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || '데이터가 없습니다.');
 
@@ -128,6 +128,18 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
       }));
       setTableData(updatedRows);
     }, [rows]);
+
+    const setTableRows = (rows) => {
+      setTableData(rows);
+      const tbody = document.querySelector('tbody');
+      if (tbody) {
+        tbody.scrollTop = 0;
+      }
+    }
+
+    const appendRows = (rows) => {
+      setTableData([...tableData, ...rows]);
+    }
 
     const handleRowClick = (row, rowIndex) => {
         props.onRowClick && props.onRowClick(row, rowIndex);
@@ -182,6 +194,11 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
       }
     }
 
+    useImperativeHandle(ref, () => ({
+      appendRows,
+      setTableRows
+    }));
+
     return (
         <>
             <TableWrapper borderstyle={border} 
@@ -228,6 +245,6 @@ const Table = ({ id = 'table', columns = [], rows = [], config = {}, ...props })
             </TableWrapper>
         </>
     )
-}
+});
 
 export default Table;

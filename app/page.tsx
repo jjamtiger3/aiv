@@ -1,7 +1,7 @@
 "use client"
 import { Container } from "./styled";
 import DateRangePicker from "./components/DateRangePicker";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DateFormat } from "./common/util";
 import Input from "./components/Input";
 import Button from "./components/Button";
@@ -39,6 +39,7 @@ export default function Home() {
         style: 'solid'
     },
 }
+const tableRef = useRef(null);
 
   useEffect(() => {
     const fetchMenuList = async () => {
@@ -88,7 +89,7 @@ export default function Home() {
     setTableColumns(newTableColumns);
   }
 
-  const fetchLineData = async (id: number, page: number) => {
+  const fetchLineData = async (id: number, page: number, replacement: boolean = false) => {
     const url = `/api/v1/report/pages/${id}/samples`;
     const query = {
       page,
@@ -105,14 +106,19 @@ export default function Home() {
     } else if (list.length > 0) {
       setCurrentPage(page);
     }
-    const newTableRows = [...tableRows, ...list];
-    setTableRows(newTableRows);
+    if (tableRef.current) {
+      if (replacement) {
+        tableRef.current.setTableRows(list);
+      } else {
+        tableRef.current.appendRows(list);
+      }
+    }
   }
 
   const handleMenuClick = async (id: number) => {
     setCurrentId(id);
     await fetchLineColumns(id);
-    await fetchLineData(id, 1);
+    await fetchLineData(id, 1, true);
   }
 
   const handleSearch = async () => {
@@ -167,7 +173,7 @@ export default function Home() {
         <main>
           <p>Line Name</p>
           <div>
-            <Table columns={tableColumns} rows={tableRows} config={tableConfig} onScrollBottom={handleScrollBottom} />
+            <Table ref={tableRef} columns={tableColumns} rows={tableRows} config={tableConfig} onScrollBottom={handleScrollBottom} />
           </div>
         </main>
       </div>
