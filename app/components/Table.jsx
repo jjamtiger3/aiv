@@ -268,6 +268,18 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
 
     const handleHeaderClick = (column, index) => {
       if (column.sortable) {
+        handleSort(column, index);
+      } else if (column.useFilter) {
+        handleFilter(column, index);
+      }
+      props.onHeaderClick && props.onHeaderClick(column, index);
+    }
+
+    const handleFilter = (column, index) => {
+      props.onFiltered && props.onFiltered(column, index);
+    }
+
+    const handleSort = (column, index) => {
         switch(column.sort) {
           case 'desc':
             column.sort = 'asc';
@@ -288,18 +300,16 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
         const sortableData = [...displayData];
         const sortKey = column.id;
         const sortDirection = column.sort;
-      sortableData.sort((a, b) => {
-        if (a[sortKey] < b[sortKey]) {
-          return sortDirection === "asc" ? -1 : 1;
-        }
-        if (a[sortKey] > b[sortKey]) {
+        sortableData.sort((a, b) => {
+          if (a[sortKey] < b[sortKey]) {
+            return sortDirection === "asc" ? -1 : 1;
+          }
+          if (a[sortKey] > b[sortKey]) {
             return sortDirection === "asc" ? 1 : -1;
           }
           return 0;
         });
         setDisplayData(sortableData);
-      }
-      props.onHeaderClick && props.onHeaderClick(column, index);
     }
 
     const handleScroll = (e) => {

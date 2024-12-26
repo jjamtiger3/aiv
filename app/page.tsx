@@ -212,7 +212,12 @@ const tableRef = useRef(null);
         <main>
           <p>Line Name</p>
           <div>
-            <Table ref={tableRef} columns={tableColumns} rows={tableRows} config={tableConfig} onScrollBottom={handleScrollBottom} />
+            <Table ref={tableRef} 
+              columns={tableColumns} 
+              rows={tableRows} 
+              config={tableConfig} 
+              onScrollBottom={handleScrollBottom} 
+            />
           </div>
         </main>
       </div>
