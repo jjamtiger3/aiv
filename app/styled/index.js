@@ -8,6 +8,9 @@ const Container = styled.div`
     aside {
         width: 300px;
     }
+    main {
+        width: calc(100% - 300px);
+    }
     .search-bar {
         height: 32px;
         padding: 10px 0;

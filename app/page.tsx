@@ -75,6 +75,7 @@ const tableRef = useRef(null);
       const _column = {
         label,
         id,
+        useFilter: index < 3 ? true : false,
         sortable: index === 3 ? true : false,
         style: {
           width

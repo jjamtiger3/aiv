@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSort } from "@fortawesome/free-solid-svg-icons/faSort";
 import { faSortDesc } from "@fortawesome/free-solid-svg-icons/faSortDesc";
 import { faSortAsc } from "@fortawesome/free-solid-svg-icons/faSortAsc";
+import { faFilter } from "@fortawesome/free-solid-svg-icons/faFilter";
 
 const TableWrapper = styled.table`
     width: 100%;
@@ -39,6 +40,12 @@ const TableWrapper = styled.table`
             }
             &:last-child {
                 border-right: none;
+            }
+            &.filterable {
+                cursor: pointer;
+                .filter-icon {
+                  margin-left: 4px;
+                }
             }
             &.sortable {
                 cursor: pointer;
@@ -199,12 +206,18 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
           return (
             <th key={index}
               style={column.style}
-              className={column.sortable ? 'sortable' : ''}
+              className={[column.sortable ? 'sortable' : '', column.useFilter ? 'filterable' : ''].join(' ')}
               onClick={() => handleHeaderClick(column, index)}
               >
               <span>
                 {column.label}
               </span>
+              {
+                column.useFilter &&
+                <span className="filter-icon">
+                  <FontAwesomeIcon icon={faFilter} />
+                </span>
+              }
               {
                 column.sortable && (!column.sort || column.sort === 'none') &&
                 <span className="sortable-icon">
@@ -244,24 +257,23 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
             column.sort = 'desc';
             break;
         }
-      }
-      // columns에서 index에 해당하는 컬럼을 찾아서 변경
-      const updatedColumns = tableColumns.map((c, i) => i === index ? column : c);
-      setTableColumns(updatedColumns);
-      const sortableData = [...displayData];
-      const sortKey = column.id;
-      const sortDirection = column.sort;
+        // columns에서 index에 해당하는 컬럼을 찾아서 변경
+        const updatedColumns = tableColumns.map((c, i) => i === index ? column : c);
+        setTableColumns(updatedColumns);
+        const sortableData = [...displayData];
+        const sortKey = column.id;
+        const sortDirection = column.sort;
       sortableData.sort((a, b) => {
         if (a[sortKey] < b[sortKey]) {
           return sortDirection === "asc" ? -1 : 1;
         }
         if (a[sortKey] > b[sortKey]) {
-          return sortDirection === "asc" ? 1 : -1;
-        }
-        return 0;
-      });
-      console.log(sortableData)
-      setDisplayData(sortableData);
+            return sortDirection === "asc" ? 1 : -1;
+          }
+          return 0;
+        });
+        setDisplayData(sortableData);
+      }
       props.onHeaderClick && props.onHeaderClick(column, index);
     }
 
