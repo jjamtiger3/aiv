@@ -7,12 +7,10 @@ import Input from "./components/Input";
 import Button from "./components/Button";
 import Table from "./components/Table";
 import useApi from "./common/request";
-import { MenuProps, LineDataProps, TableColumnProps, TableDataProps, TableRowDataProps } from "./types";
+import { MenuProps, LineDataProps, TableColumnProps, TableDataProps, TableRowDataProps, FilterConfigProps } from "./types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons/faCircleCheck";
-import { faBan, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
-import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons/faCircleExclamation";
-import { faStopCircle } from "@fortawesome/free-regular-svg-icons";
+import { faBan } from "@fortawesome/free-solid-svg-icons";
 
 export default function Home() {
   const date = new Date();
@@ -23,6 +21,8 @@ export default function Home() {
   const [menuList, setMenuList] = useState<MenuProps[]>([]);
   const [tableColumns, setTableColumns] = useState<TableColumnProps[]>([]);
   const [tableRows, setTableRows] = useState<TableDataProps[]>([]);
+
+  const [filterConfig, setFilterConfig] = useState<FilterConfigProps>({});
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currentId, setCurrentId] = useState<number>(-1);
@@ -56,6 +56,18 @@ const tableRef = useRef(null);
     }
     fetchMenuList();
   }, []);
+
+  const fetchFilterDataList = async (id: number, key: string) => {
+    const url = `/api/v1/report/pages/${id}/filters/${key}`;
+    const res = await get(url);
+    const filter_list = res.list;
+    const newFilterKey = {
+      'products': 'productKey',
+    }[key] || key;
+    setFilterConfig({
+      [newFilterKey]: filter_list
+    });
+  }
 
   const fetchLineColumns = async (id: number) => {
     const url = `/api/v1/report/pages/${id}`;
@@ -154,6 +166,7 @@ const tableRef = useRef(null);
     setCurrentMenuIndex(index);
     await fetchLineColumns(id);
     await fetchLineData(id, 1, true);
+    fetchFilterDataList(id, 'products');
   }
 
   const handleSearch = async () => {
@@ -179,20 +192,27 @@ const tableRef = useRef(null);
         )
       }
       <div className="flex space-between middle search-bar">
-        <div>
-          <DateRangePicker type="time" 
-            startDate={startDate} 
-            endDate={endDate} 
-            onDateChange={handleDateChange}
-          />
-        </div>
-        <div className="flex middle">
-          <Input 
-            type="search"
-            placeholder="Sample ID를 입력하세요" 
-            onInput={(value) => setSearchValue(value)} />
-          <Button label="Search" outline={true} onClick={handleSearch} />
-        </div>
+        {
+          currentMenuIndex !== -1 && (
+            <>
+              <div>
+                <DateRangePicker 
+                  startDate={startDate} 
+                  endDate={endDate} 
+                  onDateChange={handleDateChange}
+                />
+              </div>
+              <div className="flex middle">
+                <Input 
+                  type="search"
+                  placeholder="Sample ID를 입력하세요" 
+                  onInput={(value) => setSearchValue(value)} 
+                />
+                <Button label="Search" outline={true} onClick={handleSearch} />
+              </div>
+            </>
+          )
+        }
       </div>
       <div className="flex left">
         <aside>
@@ -216,6 +236,7 @@ const tableRef = useRef(null);
               columns={tableColumns} 
               rows={tableRows} 
               config={tableConfig} 
+              filterConfig={filterConfig}
               onScrollBottom={handleScrollBottom} 
             />
           </div>

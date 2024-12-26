@@ -1,6 +1,7 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
 import styled from "styled-components";
 import Input from "./Input";
+import CheckBox from "./CheckBox";
 import { debounce } from "../common/util";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSort } from "@fortawesome/free-solid-svg-icons/faSort";
@@ -9,6 +10,38 @@ import { faSortAsc } from "@fortawesome/free-solid-svg-icons/faSortAsc";
 import { faFilter } from "@fortawesome/free-solid-svg-icons/faFilter";
 import { DateFormat } from "../common/util";
 
+const FilterContainer = styled.div`
+  .filter-container-dim {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  .filter-container {
+    z-index: 1000;
+    position: fixed;
+    transition: top 0.3s;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    li {
+      padding: 4px 8px;
+      border-bottom: 1px solid #eaeaea;
+    }
+  }
+`;
 const TableWrapper = styled.table`
     width: 100%;
     border-collapse: collapse;
@@ -147,14 +180,21 @@ const TableWrapper = styled.table`
         text-align: center;
     }
     ${(props) => props.customclass}
+
 `
-const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, ...props }, ref) => {
+const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, filterConfig = {}, ...props }, ref) => {
     const { rowHeight, border, header, customClass, row, stripped } = config;
     const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || '데이터가 없습니다.');
 
     const [tableData, setTableData] = useState(rows);
     const [displayData, setDisplayData] = useState(rows);
     const [tableColumns, setTableColumns] = useState(columns);
+    const [filterList, setFilterList] = useState([]);
+    const [filterRect, setFilterRect] = useState({});
+
+    const [showFilter, setShowFilter] = useState(false);
+
+    const filterRef = useRef(null);
 
     useEffect(() => {
       if (!rows || rows.length === 0) {
@@ -239,7 +279,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                 }
               {
                 column.useFilter &&
-                <span className={column.label ? 'filter-icon' : ''}>
+                <span className={column.label ? 'filter-icon' : ''} onClick={(e) => handleFilter(e, column, index)}>
                   <FontAwesomeIcon icon={faFilter} />
                 </span>
               }
@@ -269,13 +309,16 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
     const handleHeaderClick = (column, index) => {
       if (column.sortable) {
         handleSort(column, index);
-      } else if (column.useFilter) {
-        handleFilter(column, index);
       }
       props.onHeaderClick && props.onHeaderClick(column, index);
     }
 
-    const handleFilter = (column, index) => {
+    const handleFilter = (e, column, index) => {
+      const { target } = e;
+      const rect = target.getBoundingClientRect();
+      setShowFilter(true);
+      setFilterRect(rect);
+      setFilterList(filterConfig[column.id]);
       props.onFiltered && props.onFiltered(column, index);
     }
 
@@ -310,6 +353,10 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
           return 0;
         });
         setDisplayData(sortableData);
+    }
+
+    const handleFilterChange = (e, checked, filter) => {
+      // checkbox의 전체 체크 상태를 가져옴
     }
 
     const handleScroll = (e) => {
@@ -379,6 +426,27 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                     ))}
                 </tbody>
             </TableWrapper>
+            {
+              showFilter &&
+              <FilterContainer>
+                <div className="filter-container-dim" onClick={() => setShowFilter(false)} />
+                <div className="filter-container" ref={filterRef} style={{top: `${filterRect.top}px`, left: `${filterRect.left}px`}}>
+                  <ul>
+                    {
+                      filterList.map((filter, index) => (
+                        <li key={index}>
+                          <CheckBox key={index} 
+                            label={filter} 
+                            id={`${filter}`} 
+                            onChange={(evt, checked) => handleFilterChange(evt, checked, filter)}
+                          />
+                        </li>
+                      ))
+                    }
+                  </ul>
+                </div>
+              </FilterContainer>
+            }
         </div>
     )
 });

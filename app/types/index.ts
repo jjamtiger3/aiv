@@ -72,4 +72,8 @@ interface TableRowDataProps {
     ng: boolean;
 }
 
-export type { Post, PostPageProps, MenuProps, LineDataProps, TableColumnProps, TableDataProps, TableRowDataProps };
+interface FilterConfigProps {
+    [key: string]: string[] | number[] | boolean[];
+}
+
+export type { Post, PostPageProps, MenuProps, LineDataProps, TableColumnProps, TableDataProps, TableRowDataProps, FilterConfigProps };

@@ -9,7 +9,7 @@ const useApi = () => {
     try {
       setLoading(true); // 로딩 시작
       const queryString = new URLSearchParams(query).toString();
-      const res = await fetch(`${base}${url}?${queryString}`).then(res => res.json());
+      const res = await fetch(`${base}${url}${queryString ? `?${queryString}` : ''}`).then(res => res.json());
       return res;
     } catch (error) {
       console.error('Error fetching data:', error);

@@ -3,8 +3,7 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 import styled from 'styled-components';
 import { addStrToCursorPosition, getByteLength } from '../common/util';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
-import { faXmark } from '@fortawesome/free-solid-svg-icons/faXmark';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const InputWrapper = styled.div`
     display: -webkit-inline-box;
