@@ -193,15 +193,16 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
     const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || '데이터가 없습니다.');
 
     const [tableData, setTableData] = useState(rows);
+    const [displayData, setDisplayData] = useState(rows);
     const [tableColumns, setTableColumns] = useState(columns);
+    const [currentColumn, setCurrentColumn] = useState(null);
     const [filterList, setFilterList] = useState([]);
+    const [selectedFilter, setSelectedFilter] = useState([]);
     const [filterRect, setFilterRect] = useState({});
 
     const [showFilter, setShowFilter] = useState(false);
 
     const filterRef = useRef(null);
-    const displayData = useMemo(() => tableData, [tableData]);
-
 
     useEffect(() => {
       if (!rows || rows.length === 0) {
@@ -215,8 +216,21 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
     }, [rows]);
 
     useEffect(() => {
+      setDisplayData(tableData);
+    }, [tableData]);
+
+    useEffect(() => {
       setTableColumns(columns);
     }, [columns]);
+
+    useEffect(() => {
+      if (currentColumn && currentColumn.useFilter) {
+        const newData = tableData.filter((data => {
+          return selectedFilter.indexOf(data[currentColumn.id]) > -1;
+        }));
+        setDisplayData(newData);
+      }
+    }, [selectedFilter]);
 
     const setTableRows = (rows) => {
       setTableData(rows);
@@ -271,7 +285,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
           return (
             <th key={index}
               style={column.style}
-              className={[column.sortable ? 'sortable' : '', column.useFilter ? 'filterable' : ''].join(' ')}
+              className={[column.sortable ? 'sortable' : '', column.useFilter ? 'filterable' : ''].filter(cls => cls).join(' ')}
               onClick={() => handleHeaderClick(column, index)}
               >
                 {
@@ -313,6 +327,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
       if (column.sortable) {
         handleSort(column, index);
       }
+      setCurrentColumn(column);
       props.onHeaderClick && props.onHeaderClick(column, index);
     }
 
@@ -356,11 +371,19 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
           return 0;
         });
         // TODO sorted data
-        // setDisplayData(sortableData);
+        setDisplayData(sortableData);
     }
 
     const handleFilterChange = (e, checked, filter) => {
-      // checkbox의 전체 체크 상태를 가져옴
+      setSelectedFilter((prevList) => {
+        if (checked) {
+          // 체크박스가 체크된 경우 filter를 추가
+          return [...prevList, filter];
+        } else {
+          // 체크박스가 체크 해제된 경우 filter를 제거
+          return prevList.filter((item) => item !== filter);
+        }
+      });
     }
 
     const handleScroll = (e) => {
@@ -409,7 +432,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
               ),
             }}
             itemContent={(rowIndex, row) => (
-              <tr className={`row ${rowIndex % 2 === 1 ? 'stripped' : ''} ${row.disabled ? 'disabled' : ''}`} key={rowIndex}
+              <tr className={['row', rowIndex % 2 === 1 ? 'stripped' : '', row.disabled ? 'disabled' : ''].filter(cls => cls).join(' ')} key={rowIndex}
                   style={{height: `${rowHeight || 22}px`}}
                   onClick={() => handleRowClick(row, rowIndex)}
               >

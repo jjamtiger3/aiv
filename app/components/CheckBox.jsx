@@ -6,7 +6,7 @@ const CheckboxContainer = styled.div`
     align-items: center;
     input {
         &:checked {
-            accent-color: #10A46E;
+            accent-color: #0157d8;
         }
     }
     &.red {
@@ -49,8 +49,8 @@ const CheckboxContainer = styled.div`
 `;
 
 const CheckboxInput = styled.input`
-    margin-right: ${props => props.labelPosition === 'right' ? '4px' : '0'}; 
-    margin-left: ${props => props.labelPosition === 'right' ? '0' : '4px'};
+    margin-right: ${props => props.labelposition === 'right' ? '4px' : '0'}; 
+    margin-left: ${props => props.labelposition === 'right' ? '0' : '4px'};
 `;
 
 const CheckboxLabel = styled.label`
@@ -113,7 +113,7 @@ const CheckBox = forwardRef(({ label, id = 'id', labelPosition = 'right', onChan
                 disabled={props.disabled}
                 checked={checked}
                 onChange={handleChange} 
-                labelPosition={labelPosition} 
+                labelposition={labelPosition} 
             />
             {
                 label && labelPosition === 'right' && 
