@@ -1,5 +1,5 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
-import styled from "styled-components";
+import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef, useMemo } from "react";
+import styled, { createGlobalStyle } from "styled-components";
 import Input from "./Input";
 import CheckBox from "./CheckBox";
 import { debounce } from "../common/util";
@@ -9,6 +9,7 @@ import { faSortDesc } from "@fortawesome/free-solid-svg-icons/faSortDesc";
 import { faSortAsc } from "@fortawesome/free-solid-svg-icons/faSortAsc";
 import { faFilter } from "@fortawesome/free-solid-svg-icons/faFilter";
 import { DateFormat } from "../common/util";
+import { TableVirtuoso } from "react-virtuoso";
 
 const FilterContainer = styled.div`
   .filter-container-dim {
@@ -42,7 +43,7 @@ const FilterContainer = styled.div`
     }
   }
 `;
-const TableWrapper = styled.table`
+const TableWrapper = createGlobalStyle`
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
@@ -50,6 +51,11 @@ const TableWrapper = styled.table`
       display: block;
       max-height: ${(props) => `${props.style?.height || '300px'}`};
       overflow-y: auto;
+    }
+    thead {
+      position: sticky;
+      top: 0px;
+      z-index: 1;
     }
     thead, tbody tr {
       display: table;
@@ -187,7 +193,6 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
     const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || '데이터가 없습니다.');
 
     const [tableData, setTableData] = useState(rows);
-    const [displayData, setDisplayData] = useState(rows);
     const [tableColumns, setTableColumns] = useState(columns);
     const [filterList, setFilterList] = useState([]);
     const [filterRect, setFilterRect] = useState({});
@@ -195,6 +200,8 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
     const [showFilter, setShowFilter] = useState(false);
 
     const filterRef = useRef(null);
+    const displayData = useMemo(() => tableData, [tableData]);
+
 
     useEffect(() => {
       if (!rows || rows.length === 0) {
@@ -210,10 +217,6 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
     useEffect(() => {
       setTableColumns(columns);
     }, [columns]);
-
-    useEffect(() => {
-      setDisplayData(tableData);
-    }, [tableData]);
 
     const setTableRows = (rows) => {
       setTableData(rows);
@@ -352,7 +355,8 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
           }
           return 0;
         });
-        setDisplayData(sortableData);
+        // TODO sorted data
+        // setDisplayData(sortableData);
     }
 
     const handleFilterChange = (e, checked, filter) => {
@@ -377,7 +381,64 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
 
     return (
         <div style={{overflowX: 'auto', width: '100%'}}>
-            <TableWrapper borderstyle={border} 
+          <TableWrapper borderstyle={border} 
+            headerstyle={header} 
+            rowstyle={row} 
+            strippedstyle={stripped}
+            customclass={customClass}
+            className={props.className}
+          />
+          <TableVirtuoso
+            style={{ height: props.style?.height || '300px' }}
+            totalCount={tableData.length}
+            data={displayData}
+            fixedHeaderContent={() => (
+              <tr className={'header'}>
+                  {tableColumns.map((column, index) => (
+                    makeHeadEl(column, index)
+                  ))}
+              </tr>
+            )}
+            components={{
+              Header: (props) => (
+                <tr className={'header'}>
+                    {tableColumns.map((column, index) => (
+                      makeHeadEl(column, index)
+                    ))}
+                </tr>
+              ),
+            }}
+            itemContent={(rowIndex, row) => (
+              <tr className={`row ${rowIndex % 2 === 1 ? 'stripped' : ''} ${row.disabled ? 'disabled' : ''}`} key={rowIndex}
+                  style={{height: `${rowHeight || 22}px`}}
+                  onClick={() => handleRowClick(row, rowIndex)}
+              >
+                  {
+                    tableColumns.map((column, columnIndex) => (
+                        column.template ? 
+                        <React.Fragment key={`header_${columnIndex}`}>
+                          {React.cloneElement(column.template(row), {
+                            onClick: () => handleCellClick(column, row),
+                          })}
+                        </React.Fragment>
+                        :
+                        <td key={`header_${columnIndex}`}
+                            className={'cell'}
+                            style={column.style && column.style}
+                            onClick={() => handleCellClick(column, row)}
+                        >
+                            {
+                                makeCellEl(column, row)
+                            }
+                        </td>
+                    ))
+                  }
+              </tr>
+              )
+            }
+            onScroll={handleScroll}
+          />
+            {/* <TableWrapper borderstyle={border} 
               headerstyle={header} 
               rowstyle={row} 
               strippedstyle={stripped}
@@ -425,7 +486,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                         </tr>
                     ))}
                 </tbody>
-            </TableWrapper>
+            </TableWrapper> */}
             {
               showFilter &&
               <FilterContainer>

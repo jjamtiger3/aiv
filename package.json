@@ -20,6 +20,7 @@
     "react-bootstrap-daterangepicker": "^8.0.0",
     "react-dom": "^18.0.0",
     "react-redux": "^9.2.0",
+    "react-virtuoso": "^4.12.3",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {
