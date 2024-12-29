@@ -19,7 +19,7 @@ export default function Home() {
   const [searchValue, setSearchValue] = useState<string>('');
 
   const [menuList, setMenuList] = useState<MenuProps[]>([]);
-  const [tableColumns, setTableColumns] = useState<TableColumnProps[]>([]);
+  const [tableColumns, setTableColumns] = useState([]);
   const [tableRows, setTableRows] = useState<TableDataProps[]>([]);
 
   const [filterConfig, setFilterConfig] = useState<FilterConfigProps>({});
@@ -171,7 +171,9 @@ const tableRef = useRef(null);
   }
 
   const handleSearch = async () => {
-    console.log(searchValue)
+    if (tableRef.current) {
+      tableRef.current.filterRows('sampleId', searchValue);
+    }
   }
 
   const handleDateChange = (startDate: Date, endDate: Date) => {
@@ -207,7 +209,7 @@ const tableRef = useRef(null);
                 <Input 
                   type="search"
                   placeholder="Sample ID를 입력하세요" 
-                  onInput={(value) => setSearchValue(value)} 
+                  onInput={(value: string) => setSearchValue(value)} 
                 />
                 <Button label="Search" outline={true} onClick={handleSearch} />
               </div>

@@ -240,6 +240,15 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
       }
     }
 
+    const filterRows = (key, searchValue) => {
+      const filteredRows = tableData.filter((data => data[key].includes(searchValue)));
+      setDisplayData(filteredRows);
+      const tbody = document.querySelector('tbody');
+      if (tbody) {
+        tbody.scrollTop = 0;
+      }
+    }
+
     const appendRows = (rows) => {
       setTableData([...tableData, ...rows]);
     }
@@ -400,7 +409,8 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
 
     useImperativeHandle(ref, () => ({
       appendRows,
-      setTableRows
+      setTableRows,
+      filterRows
     }));
 
     return (
