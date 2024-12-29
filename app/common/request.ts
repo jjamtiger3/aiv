@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Swal from 'sweetalert2';
 
 const base = 'http://localhost:4000';
 
@@ -11,8 +12,9 @@ const useApi = () => {
       const queryString = new URLSearchParams(query).toString();
       const res = await fetch(`${base}${url}${queryString ? `?${queryString}` : ''}`).then(res => res.json());
       return res;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching data:', error);
+      Swal.fire(error.toString());
       throw error;
     } finally {
       setLoading(false); // 로딩 종료

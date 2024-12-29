@@ -31,6 +31,9 @@ export default function Home() {
   const { get, loading } = useApi();
   const tableConfig = {
     rowHeight: 40,
+    stripped: {
+      backgroundColor: '#ffeeee'
+    },
     header: {
         height: 40,
         border: {
@@ -105,7 +108,7 @@ const tableRef = useRef(null);
       } as TableColumnProps;
       if (index === 1) {
         _column.template = (row: TableDataProps) => {
-          return <td className={`cell`} style={_column.style}>
+          return <td className={`row cell`} style={_column.style}>
             <span>{
             row.ng ? 
               <FontAwesomeIcon icon={faBan} className="ng-icon" />
@@ -124,7 +127,7 @@ const tableRef = useRef(null);
             value = value.toFixed(_column.decimal);
           }
           return <td
-            className={`cell ${isNG ? 'ng' : ''}`}
+            className={`row cell ${isNG ? 'ng' : ''}`}
             style={_column.style}
           >
             <span>{value || '결과 없음'}</span>

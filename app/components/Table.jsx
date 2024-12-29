@@ -2,7 +2,6 @@ import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef, us
 import styled, { createGlobalStyle } from "styled-components";
 import Input from "./Input";
 import CheckBox from "./CheckBox";
-import { debounce } from "../common/util";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSort } from "@fortawesome/free-solid-svg-icons/faSort";
 import { faSortDesc } from "@fortawesome/free-solid-svg-icons/faSortDesc";
@@ -103,6 +102,10 @@ const TableWrapper = createGlobalStyle`
     }
     .row {
       background-color: #f9fafa;
+      &:hover {
+          background-color: ${(props) => `${props.rowstyle?.mouseOver?.backgroundColor || '#e6e6e6'}`};
+          cursor: pointer;
+      }
       &.disabled {
         background-color: ${(props) => `${props.rowstyle?.disabled?.backgroundColor || '#f3f3f3'}`};
         opacity: 0.5;
@@ -111,10 +114,6 @@ const TableWrapper = createGlobalStyle`
       &.stripped {
         background-color: ${(props) => `${props.strippedstyle?.backgroundColor || '#f4f4f4'}`};
       }
-        &:hover {
-            background-color: ${(props) => `${props.rowstyle?.mouseOver?.backgroundColor || '#e6e6e6'}`};
-            cursor: pointer;
-        }
         .icon {
             display: inline-block;
             background-repeat: no-repeat;
@@ -137,48 +136,54 @@ const TableWrapper = createGlobalStyle`
                 background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12.408 13.032c1.158-.062 2.854-.388 4.18-1.128.962-1.478 1.598-2.684 2.224-4-.86.064-1.852-.009-2.736-.257 1.068-.183 2.408-.565 3.422-1.216 1.255-1.784 2.185-4.659 2.502-6.429-2.874-.048-5.566.89-7.386 2.064-.614.7-1.146 2.389-1.272 3.283-.277-.646-.479-1.68-.242-2.542-1.458.767-2.733 1.643-4.177 2.86-.72 1.528-.834 3.29-.768 4.276-.391-.553-.915-1.63-.842-2.809-2.59 2.504-4.377 5.784-2.682 9.324 1.879-1.941 4.039-3.783 5.354-4.639-3.036 3.474-5.866 8.047-7.985 12.181l2.504-.786c1.084-1.979 2.059-3.684 2.933-4.905 3.229.423 6.096-2.168 8.028-4.795-.77.19-2.246-.058-3.057-.482z'/%3E%3C/svg%3E");
             }
         }
-        .cell {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-            border-bottom: ${(props) => `${props.borderstyle?.borderBottom || '0px solid #eaeaea'}`};
-            border-right: ${(props) => `${props.borderstyle?.borderBottom || '1px solid #eaeaea'}`};
-            padding: ${(props) => `${props.rowstyle?.style?.padding || '4px'}`};
-            font-size: ${(props) => `${props.cellstyle?.style?.fontSize || '12px'}`}; 
-            height: ${(props) => `${props.rowstyle?.height || 40}px`};
-            text-align: center;
-            &-data {
-                svg {
-                    margin-right: 10px;
-                }
+    }
+    .cell {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+        border-bottom: ${(props) => `${props.borderstyle?.borderBottom || '0px solid #eaeaea'}`};
+        border-right: ${(props) => `${props.borderstyle?.borderBottom || '1px solid #eaeaea'}`};
+        padding: ${(props) => `${props.rowstyle?.style?.padding || '4px'}`};
+        font-size: ${(props) => `${props.cellstyle?.style?.fontSize || '12px'}`}; 
+        height: ${(props) => `${props.rowstyle?.height || 40}px`};
+        text-align: center;
+        background-color: #f9fafa;
+        &.disabled {
+          background-color: ${(props) => `${props.rowstyle?.disabled?.backgroundColor || '#f3f3f3'}`};
+          opacity: 0.5;
+          pointer-events: none;
+        }
+        &-data {
+            svg {
+                margin-right: 10px;
             }
-            &.ng {
-              background-color: #ffcccc;
-              color: #222;
+        }
+        &.ng {
+          background-color: #ffcccc;
+          color: #222;
+        }
+        .ng-icon {
+          color: #ff0000;
+        }
+        .ok-icon {
+          color: #006611;
+        }
+        .icon-circle {
+            width: 30px;
+            height: 30px;
+            background-color: rgba(120, 111, 119, 0.05);
+            display: inline-block;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            svg {
+              color: #786f77;
             }
-            .ng-icon {
-              color: #ff0000;
-            }
-            .ok-icon {
-              color: #006611;
-            }
-            .icon-circle {
-                width: 30px;
-                height: 30px;
-                background-color: rgba(120, 111, 119, 0.05);
-                display: inline-block;
-                border-radius: 50%;
-                margin: 0 auto;
-                display: inline-flex;
-                justify-content: center;
-                align-items: center;
-                svg {
-                  color: #786f77;
-                }
-            }
-            .suffix {
-                margin-left: 5px;
-            }
+        }
+        .suffix {
+            margin-left: 5px;
         }
     }
     .empty-cell {
@@ -189,7 +194,7 @@ const TableWrapper = createGlobalStyle`
 
 `
 const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, filterConfig = {}, ...props }, ref) => {
-    const { rowHeight, border, header, customClass, row, stripped } = config;
+    const { border, header, customClass, row, stripped } = config;
     const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || '데이터가 없습니다.');
 
     const [tableData, setTableData] = useState(rows);
@@ -443,10 +448,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
               ),
             }}
             itemContent={(rowIndex, row) => (
-              <tr className={['row', rowIndex % 2 === 1 ? 'stripped' : '', row.disabled ? 'disabled' : ''].filter(cls => cls).join(' ')} key={rowIndex}
-                  style={{height: `${rowHeight || 22}px`}}
-                  onClick={() => handleRowClick(row, rowIndex)}
-              >
+              <>
                   {
                     tableColumns.map((column, columnIndex) => (
                         column.template ? 
@@ -457,7 +459,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                         </React.Fragment>
                         :
                         <td key={`header_${columnIndex}`}
-                            className={'cell'}
+                            className={['row', 'cell', rowIndex % 2 === 1 ? 'stripped' : '', row.disabled ? 'disabled' : ''].filter(cls => cls).join(' ')}
                             style={column.style && column.style}
                             onClick={() => handleCellClick(column, row)}
                         >
@@ -467,60 +469,11 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                         </td>
                     ))
                   }
-              </tr>
+              </>
               )
             }
             onScroll={handleScroll}
           />
-            {/* <TableWrapper borderstyle={border} 
-              headerstyle={header} 
-              rowstyle={row} 
-              strippedstyle={stripped}
-              customclass={customClass}
-              className={props.className}
-              >
-                <thead>
-                    <tr className={'header'}>
-                        {tableColumns.map((column, index) => (
-                          makeHeadEl(column, index)
-                        ))}
-                    </tr>
-                </thead>
-                <tbody onScroll={debounce(handleScroll, 100)}>
-                    {
-                        displayData.length === 0 && <tr>
-                            <td className={'empty-cell'}>{emptyMessage}</td>
-                        </tr>
-                    }
-                    {displayData.map((row, rowIndex) => (
-                        <tr className={`row ${rowIndex % 2 === 1 ? 'stripped' : ''} ${row.disabled ? 'disabled' : ''}`} key={rowIndex}
-                            style={{height: `${rowHeight || 22}px`}}
-                            onClick={() => handleRowClick(row, rowIndex)}
-                        >
-                            {
-                              tableColumns.map((column, columnIndex) => (
-                                  column.template ? 
-                                  <React.Fragment key={`header_${columnIndex}`}>
-                                    {React.cloneElement(column.template(row), {
-                                      onClick: () => handleCellClick(column, row),
-                                    })}
-                                  </React.Fragment>
-                                  :
-                                  <td key={`header_${columnIndex}`}
-                                      className={'cell'}
-                                      style={column.style && column.style}
-                                      onClick={() => handleCellClick(column, row)}
-                                  >
-                                      {
-                                          makeCellEl(column, row)
-                                      }
-                                  </td>
-                              ))
-                            }
-                        </tr>
-                    ))}
-                </tbody>
-            </TableWrapper> */}
             {
               showFilter &&
               <FilterContainer>
