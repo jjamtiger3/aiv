@@ -57,15 +57,16 @@ const tableRef = useRef(null);
     fetchMenuList();
   }, []);
 
-  const fetchFilterDataList = async (id: number, key: string) => {
-    const url = `/api/v1/report/pages/${id}/filters/${key}`;
+  const fetchFilterDataList = async (id: number) => {
+    const url = `/api/v1/report/pages/${id}/filters/products`;
     const res = await get(url);
     const filter_list = res.list;
-    const newFilterKey = {
-      'products': 'productKey',
-    }[key] || key;
     setFilterConfig({
-      [newFilterKey]: filter_list
+      'productKey': filter_list,
+      'ng': [true, false],
+      'filterLabel': {
+        'ng': ['NG', 'Normal']
+      }
     });
   }
 
@@ -93,7 +94,7 @@ const tableRef = useRef(null);
       const _column = {
         label,
         id,
-        useFilter: index < 3 ? true : false,
+        useFilter: index < 2 ? true : false,
         sortable: index === 3 ? true : false,
         decimal: column.option?.decimal || null,
         type: index === 3 ? 'date' : 'text',
@@ -166,7 +167,7 @@ const tableRef = useRef(null);
     setCurrentMenuIndex(index);
     await fetchLineColumns(id);
     await fetchLineData(id, 1, true);
-    fetchFilterDataList(id, 'products');
+    fetchFilterDataList(id);
   }
 
   const handleSearch = async () => {

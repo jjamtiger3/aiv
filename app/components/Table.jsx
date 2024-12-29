@@ -337,6 +337,7 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
       setShowFilter(true);
       setFilterRect(rect);
       setFilterList(filterConfig[column.id]);
+      setSelectedFilter(filterConfig[column.id]);
       props.onFiltered && props.onFiltered(column, index);
     }
 
@@ -520,8 +521,9 @@ const Table = forwardRef(({ id = 'table', columns = [], rows = [], config = {}, 
                       filterList.map((filter, index) => (
                         <li key={index}>
                           <CheckBox key={index} 
-                            label={filter} 
+                            label={filterConfig.filterLabel[currentColumn.id] ? filterConfig.filterLabel[currentColumn.id][index] : filter} 
                             id={`${filter}`} 
+                            checked={true}
                             onChange={(evt, checked) => handleFilterChange(evt, checked, filter)}
                           />
                         </li>

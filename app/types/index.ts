@@ -73,7 +73,7 @@ interface TableRowDataProps {
 }
 
 interface FilterConfigProps {
-    [key: string]: string[] | number[] | boolean[];
+    [key: string]: string[] | number[] | boolean[] | object;
 }
 
 export type { Post, PostPageProps, MenuProps, LineDataProps, TableColumnProps, TableDataProps, TableRowDataProps, FilterConfigProps };
