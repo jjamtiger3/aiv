@@ -5,13 +5,13 @@
 #### AIV Frontend 과제용 프로젝트입니다.
 
 ## 프로젝트 구조
-├── components      재사용 가능한 컴포넌트
-├── pages           라우팅을 담당하는 페이지
-├── public          정적 파일 (이미지, 폰트 등)
-├── styled          components를 제외한 페이지의 스타일 파일
-├── common          공통으로 사용되는 파일 모음
-├── package.json    프로젝트 설정 및 의존성 정보
-└── README.md       프로젝트 개요 및 설명
+* components      재사용 가능한 컴포넌트
+* pages           라우팅을 담당하는 페이지
+* public          정적 파일 (이미지, 폰트 등)
+* styled          components를 제외한 페이지의 스타일 파일
+* common          공통으로 사용되는 파일 모음
+* package.json    프로젝트 설정 및 의존성 정보
+* README.md       프로젝트 개요 및 설명
 
 ## 구현한 코드의 최적화 방안
 ### components
