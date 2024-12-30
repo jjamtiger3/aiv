@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FrontEnd 서인석_AIV 과제
 
-## Getting Started
+## 프로젝트 소개
 
-First, run the development server:
+#### AIV Frontend 과제용 프로젝트입니다.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 프로젝트 구조
+├── components      재사용 가능한 컴포넌트
+├── pages           라우팅을 담당하는 페이지
+├── public          정적 파일 (이미지, 폰트 등)
+├── styled          components를 제외한 페이지의 스타일 파일
+├── common          공통으로 사용되는 파일 모음
+├── package.json    프로젝트 설정 및 의존성 정보
+└── README.md       프로젝트 개요 및 설명
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 구현한 코드의 최적화 방안
+### components
+### Table에 최적화를 적용
+* 스크롤시 중복요청의 최소화를 위해 debouncing적용
+* 원본데이터 / 표시용 데이터 분리
+* 렌더링 속도를 최적화 하기 위해 react-virtuoso를 사용한 가상화 렌더링 기법 적용
+### page.tsx
+* 로딩시 필터링데이터를 요청 -> 컴포넌트와 요청부 분리
+* 타입을 적용하여 column및 data의 유지보수성 안정성 향상
+* style 분리를 통한 가독성 향상
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 기술 스택
+* Next.js: React 기반의 SSR/SSG 지원 프레임워크
+* TypeScript: 정적 타입 지원으로 안정성 확보
+* Docker: 컨테이너화로 개발 및 배포 환경 일관성 유지
+* Styled-components: 스타일 관리를 위한 CSS-in-JS 라이브러리
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 설치 및 실행방법
+1. 프로젝트 clone
+    git clone https://github.com/jjamtiger3/aiv
+    cd project-name
+2. 의존성 설치
+    npm install
+3. 개발 서버 실행
+    npm run dev
+4. 빌드 및 배포
+    npm run build
+    npm run start
